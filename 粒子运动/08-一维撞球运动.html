@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title></title>
+  <style>
+    canvas {
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script src="./utils.js"></script>
+  <script src="./Particle.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let W = canvas.width = 800;
+    let H = canvas.height = 600;
+    
+    /**
+     * 动量:表示为物体的质量和速度的乘积
+     * 动量的计算公式：p = m * v
+     *
+     * 动量守恒:如果一个系统不受外力或所受外力的矢量和为零，那么这个系统的总动量保持不变
+     * 动量守恒公式: m1 * v1 + m2 * v2 = m1 * v1Final + m2 * v2Final;
+     *
+     * 动能:物体由于运动而具有的能量，称为物体的动能。它的大小定义为物体质量与速度平方乘积的二分之一
+     * 动能的计算公式: ek = 1/2 * m * (v**2)
+     *
+     * 动能守恒: 物体或系统不受力或者所受之力（对于系统，包括外力与内力）矢量和为零，或者各力所做元功代数和为零，那么物体或系统的动能保持不变。
+     * 动能守恒公式: 1/2 * m1 * v1**2 + 1/2 * m2 * v2**2 = 1/2 * m1 * v1Final**2 + 1/2 * m2 * v2Final**2 
+     *
+     * 两个物体碰撞后的速度：
+     *  v1Final = ((m1 – m2)* v1 + 2*m2*v2) / (m1 + m2);
+     *  v2Final = ((m2 – m1)* v2 + 2*m1*v1) / (m1 + m2);
+     */
+    
+    const p1 = new Particle({
+      x: 120,
+      y: H/2,
+      r: 100,
+      fillStyle: 'rgb(28, 137, 223)',
+      vx: 1,
+      m: 20
+    });
+    
+    const p2 = new Particle({
+      x: W - 60,
+      y: H/2,
+      r: 50,
+      fillStyle: 'rgb(223, 28, 127)',
+      vx: -5,
+      m: 1
+    });
+    
+    function drawLine(){
+      ctx.save();
+      ctx.strokeStyle = 'rgb(23, 227, 184)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.lineTo(0, H/2);
+      ctx.lineTo(W, H/2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    
+    (function drawFrame(){
+      window.requestAnimationFrame(drawFrame);
+      ctx.clearRect(0, 0, W, H);
+      
+      p1.x += p1.vx;
+      p2.x += p2.vx;
+      
+      const dist = Math.abs(p1.x - p2.x);
+      
+      if(dist < p1.r + p2.r){
+        // v1Final = ((m1 – m2)* v1 + 2*m2*v2) / (m1 + m2);
+        // v2Final = ((m2 – m1)* v2 + 2*m1*v1) / (m1 + m2);
+        
+        let v1Final = ((p1.m - p2.m) * p1.vx + 2 * p2.m * p2.vx) / (p1.m + p2.m);
+        let v2Final = ((p2.m - p1.m) * p2.vx + 2 * p1.m * p1.vx) / (p1.m + p2.m);
+        
+        p1.vx = v1Final;
+        p2.vx = v2Final;
+      }
+      
+      drawLine();
+      p1.render(ctx);
+      p2.render(ctx);
+    })();
+    
+  </script>
+</body>
+</html>

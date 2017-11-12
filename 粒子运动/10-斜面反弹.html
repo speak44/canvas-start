@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title></title>
+  <style>
+    canvas {
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script src="./utils.js"></script>
+  <script src="./Particle.js"></script>
+  <script src="./Line.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let W = canvas.width = 1000;
+    let H = canvas.height = 600;
+    
+    const p = new Particle({
+      x: 300,
+      y: 100,
+      r: 40,
+      fillStyle: 'rgb(203, 45, 131)'
+    });
+
+    const line = new Line({
+      x: 200,
+      y: 280,
+      startX: 0,
+      startY: 0,
+      endX: 500,
+      endY: 0,
+      rotation: 10*Math.PI/180
+    });
+    
+    const g = 0.1, bounce = -1;
+    
+    let sin = Math.sin(line.rotation);
+    let cos = Math.cos(line.rotation);
+    
+    (function drawFrame(){
+      window.requestAnimationFrame(drawFrame);
+      ctx.clearRect(0, 0, W, H);
+      
+      p.vy += g;
+      p.x += p.vx;
+      p.y += p.vy;
+      
+      let rx = p.x - line.x;
+      let ry = p.y - line.y;
+      
+      // 将小球的坐标进行旋转
+      let x1 = rx * cos + ry * sin;
+      let y1 = ry * cos - rx * sin;
+      
+      // 将小球的速度进行旋转
+      let vx1 = p.vx * cos + p.vy * sin;
+      let vy1 = p.vy * cos - p.vx * sin;
+      
+      if(x1 - p.r < line.endX && x1 + p.r > line.startX){
+        if(y1 + p.r > 0 && vy1 > y1){
+          y1 = -p.r;
+          vy1 *= bounce;
+        }
+        if(y1 - p.r < 0 && vy1 < y1){
+          y1 = p.r;
+          vy1 *= bounce;
+        }
+      }
+      
+      rx = x1 * cos - y1 * sin;
+      ry = y1 * cos + x1 * sin;
+      
+      p.x = line.x + rx;
+      p.y = line.y + ry;
+      
+      p.vx = vx1 * cos - vy1 * sin;
+      p.vy = vy1 * cos + vx1 * sin;
+      
+      checkBounce(p, W, H, bounce);
+      
+      line.render(ctx);
+      p.render(ctx);
+    })();
+    
+  </script>
+</body>
+</html>

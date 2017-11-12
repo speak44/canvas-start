@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title></title>
+  <style>
+    canvas {
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script src="./Particle.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let W = canvas.width = 800;
+    let H = canvas.height = 600;
+    
+    const p = new Particle({
+      x: 60,
+      y: H/2,
+      r: 50,
+      fillStyle: 'rgb(203, 45, 131)',
+      vx: 2
+    });
+    
+    function drawLine(){
+      ctx.save();
+      ctx.strokeStyle = 'rgb(114, 236, 39)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.lineTo(0, H/2);
+      ctx.lineTo(W, H/2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  
+    (function drawFrame(){
+      window.requestAnimationFrame(drawFrame);
+      ctx.clearRect(0, 0, W, H);
+      
+      p.x += p.vx;
+      
+      drawLine();
+      p.render(ctx);
+    })();
+    
+  </script>
+</body>
+</html>
